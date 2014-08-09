@@ -1,0 +1,42 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MCCCivitasBlackTech", "NeighborhoodCommittee\MCCCivitasBlackTech.csproj", "{A6981A98-9C0B-4865-8E09-2B266E98E4B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Consoletest", "consoletest\Consoletest.csproj", "{5DFBC65B-978F-4EB8-9117-786BF436EEA4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5DFBC65B-978F-4EB8-9117-786BF436EEA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DFBC65B-978F-4EB8-9117-786BF436EEA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DFBC65B-978F-4EB8-9117-786BF436EEA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DFBC65B-978F-4EB8-9117-786BF436EEA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6981A98-9C0B-4865-8E09-2B266E98E4B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6981A98-9C0B-4865-8E09-2B266E98E4B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6981A98-9C0B-4865-8E09-2B266E98E4B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6981A98-9C0B-4865-8E09-2B266E98E4B1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = consoletest\Consoletest.csproj
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		$0.TextStylePolicy = $2
+		$2.inheritsSet = null
+		$2.scope = text/x-csharp
+		$0.CSharpFormattingPolicy = $3
+		$3.ElseIfNewLinePlacement = SameLine
+		$3.AfterDelegateDeclarationParameterComma = True
+		$3.inheritsSet = Mono
+		$3.inheritsScope = text/x-csharp
+		$3.scope = text/x-csharp
+		$0.StandardHeader = $4
+		$4.Text = 
+		$4.IncludeInNewFiles = True
+	EndGlobalSection
+EndGlobal
