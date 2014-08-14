@@ -18,14 +18,13 @@ namespace Consoletest
         /// <param name="args">The command-line arguments.</param>
         public static void Main(string[] args)
         {
-            /*if (args.Length < 2) 
+            if (args.Length < 2) 
             {
             Console.WriteLine("老兄啊，不打用户名密码怎么潜入啊……格式就是后面加上空格email空格密码");
             return;
-            }*/
+            }
 
-            ////User user = new User(args[0], args[1]);
-            User user = new User("nightghostjiyou@gmail.com", "lyrebirdYECHYI");
+            User user = new User(args[0], args[1]);           
             if (user.Login())
             {
                 Console.WriteLine("Enter succeed!");
