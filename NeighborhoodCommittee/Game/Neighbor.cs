@@ -7,12 +7,23 @@ namespace MCCCivitasBlackTech
     public class Neighbor
     {
         public List<Estate> Estates = new List<Estate>();
-        public int Id = -1;
-        string name = string.Empty;
-        bool ready = false;
-        double health = 0;
-        double prosperity = 0;
-        double industry = 0;
+        private string name = string.Empty;
+        private bool ready = false;
+        private double health = 0;
+        private double prosperity = 0;
+        private double industry = 0;
+
+        public Neighbor(int id, string name, User user)
+        {
+            this.Id = id;
+            this.name = name;
+        }
+
+        public int ID 
+        { 
+            get; 
+            set; 
+        }
 
         public double Health
         {
@@ -37,12 +48,6 @@ namespace MCCCivitasBlackTech
         public bool Ready
         {
             get { return this.ready; }
-        }
-
-        public Neighbor(int id, string name, User user)
-        {
-            this.Id = id;
-            this.name = name;
         }
 
         public void SeeNeighbor(User user)
@@ -72,6 +77,7 @@ namespace MCCCivitasBlackTech
                             UrlHelpers.CutBetween(text, "<div class=\"Subject\">产业</div>", "%</div>"),
                             "ive\">"));
                     }
+
                     text = string.Empty;
                     if (UrlHelpers.GetHtml(
                         "http://civitas.soobb.com/Districts/" + this.Id + "/Estates/",
@@ -80,7 +86,7 @@ namespace MCCCivitasBlackTech
                     {
                         string strCount = UrlHelpers.CutBetween(text, "<span class=\"Count\">(共 ", "条)</span>");
                         int count = Convert.ToInt32(strCount);
-                        int pageCount = count / 20 + 1;
+                        int pageCount = (count / 20) + 1;
                         for (int i = 1, j = 0; i <= pageCount; i++)
                         {
                             if (UrlHelpers.GetHtml(
@@ -110,10 +116,14 @@ namespace MCCCivitasBlackTech
 
                                 Console.Write("[" + this.Name[0] + "]");
                             }
+
                             if (j == count)
+                            {
                                 break;
+                            }
                         }
                     }
+
                     Console.WriteLine("\n窥探【" + this.Name + "】完毕，有种放学别走！");
                     this.ready = true;
                 }).Start();
@@ -121,4 +131,3 @@ namespace MCCCivitasBlackTech
         }
     }
 }
-

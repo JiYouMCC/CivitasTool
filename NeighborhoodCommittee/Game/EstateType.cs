@@ -5,27 +5,36 @@ namespace MCCCivitasBlackTech
 
     public class EstateType : IComparable<EstateType>
     {
-        static public List<EstateType> estateTypes = new List<EstateType>();
+        public static List<EstateType> EstateTypes = new List<EstateType>();
         private string name;
+       
+        public EstateType(string name)
+        {
+            this.name = name;
+            if (GetEstateType(name) == null)
+            {
+                EstateTypes.Add(this);
+            }
+            else
+            {
+                return;
+            }
+        }
+
         public string Name
         {
             get { return this.name; }
         }
 
-        public EstateType(string name)
-        {
-            this.name = name;
-            if (GetEstateType(name) == null)
-                estateTypes.Add(this);
-            else
-                return;
-        }
-
         public static EstateType GetEstateType(string name)
         {
-            foreach (EstateType estatetype in estateTypes)
+            foreach (EstateType estatetype in EstateTypes)
+            {
                 if (estatetype.Name == name)
+                {
                     return estatetype;
+                }
+            }
 
             return null;
         }
