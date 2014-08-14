@@ -44,11 +44,15 @@ namespace MCCCivitasBlackTech
 		public double Count()
 		{
 			double count = 0;
-			if (this.Businesses.Count <= 0)
-				return -1;
+            if (this.Businesses.Count <= 0)
+            {
+                return -1;
+            }
 
-			foreach (Business b in Businesses)
-				count += b.Count;
+            foreach (Business b in Businesses)
+            {
+                count += b.Count;
+            }
 
 			return count;
 		}
@@ -74,12 +78,18 @@ namespace MCCCivitasBlackTech
 		public double HighPrice()
 		{
 			double highPrice = -1;
-			if (this.Businesses.Count <= 0)
-				return -1;
+            if (this.Businesses.Count <= 0)
+            {
+                return -1;
+            }
 
-			foreach (Business b in Businesses)			
-				if (b.Price > highPrice)
-					highPrice = b.Price;
+            foreach (Business b in this.Businesses)
+            {
+                if (b.Price > highPrice)
+                {
+                    highPrice = b.Price;
+                }
+            }
 
 			return highPrice;
 		}
