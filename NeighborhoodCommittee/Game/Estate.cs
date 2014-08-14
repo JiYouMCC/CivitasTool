@@ -4,13 +4,6 @@ namespace MCCCivitasBlackTech
 
     public class Estate : IComparable<Estate>
     {
-        public string Name;
-        public EstateType Type;
-        public double Area;
-        public string EstatePath;
-        public string Owner;
-        public string OwnerPath;
-
         public Estate(string name, EstateType type, double area, string estatePath, string owner, string ownerPath)
         {
             this.Name = name;
@@ -20,21 +13,58 @@ namespace MCCCivitasBlackTech
             this.Owner = owner;
             this.OwnerPath = ownerPath;
         }
+        
+        public string Name
+        {
+            get;
+            set;
+        }
 
+        public EstateType Type
+        {
+            get;
+            set;
+        }
+
+        public double Area
+        {
+            get;
+            set;
+        }
+
+        public string EstatePath
+        {
+            get;
+            set;
+        }
+
+        public string Owner
+        {
+            get;
+            set;
+        }
+
+        public string OwnerPath
+        {
+            get;
+            set;
+        }
+      
         public void Print()
         {
-            Console.WriteLine(Name + " " + Owner + " " + EstatePath + " " + Type.Name);
+            Console.WriteLine(this.Name + " " + this.Owner + " " + this.EstatePath + " " + this.Type.Name);
         }
 
         #region IComparable implementation
         public int CompareTo(Estate other)
         {
             if (this.Owner.CompareTo(other.Owner) == 0)
+            {
                 return this.EstatePath.CompareTo(other.EstatePath);
+            }
 
             return this.Owner.CompareTo(other.Owner);
         }
         #endregion
     }
 }
-

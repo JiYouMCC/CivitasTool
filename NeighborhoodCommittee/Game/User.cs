@@ -1,22 +1,28 @@
 namespace MCCCivitasBlackTech
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Net;
     using System.Text;
-    using System.Collections.Generic;
     using System.Threading;
-    using System.Diagnostics;
 
     public class User
     {
+        private const string LOGIN = "http://www.soobb.com/Accounts/AjaxAuthenticate/";
         private string cookieContainer = string.Empty;
         private string emailAddress;
         private string password;
-        bool isLogin;
+        private bool isLogin;
         private List<Neighbor> neighbors = new List<Neighbor>();
         private string city = string.Empty;
-        bool ready = false;
+        private bool ready = false;
+
+        public User(string emailAddress, string password)
+        {
+            this.emailAddress = emailAddress;
+            this.password = password;
+        }
 
         public bool Ready
         {
@@ -29,9 +35,14 @@ namespace MCCCivitasBlackTech
             {
                 if (this.ready)
                 {
-                    foreach (Neighbor neighbor in neighbors)
+                    foreach (Neighbor neighbor in this.neighbors)
+                    {
                         if (!neighbor.Ready)
+                        {
                             return false;
+                        }
+                    }
+
                     return true;
                 }
                 else
@@ -59,14 +70,6 @@ namespace MCCCivitasBlackTech
         public string CookieContainer
         {
             get { return this.cookieContainer; }
-        }
-
-        const string LOGIN = "http://www.soobb.com/Accounts/AjaxAuthenticate/";
-
-        public User(string emailAddress, string password)
-        {
-            this.emailAddress = emailAddress;
-            this.password = password;
         }
 
         public bool Login()
@@ -122,16 +125,17 @@ namespace MCCCivitasBlackTech
                 {
                     Console.WriteLine(ex.Message);
                 }
+
                 this.isLogin = false;
                 return false;
             }
+
             return true;
         }
 
         public void FindNeighbor()
         {
-            new Thread
-                (delegate()
+            new Thread(delegate()
             {
                 string text = string.Empty;
                 this.neighbors.Clear();
@@ -147,8 +151,11 @@ namespace MCCCivitasBlackTech
                         foreach (Neighbor nei in this.neighbors)
                         {
                             if (nei.Id == id)
+                            {
                                 contains = true;
+                            }
                         }
+
                         if (!contains)
                         {
                             this.neighbors.Add(new Neighbor(id, name, this));
@@ -156,10 +163,10 @@ namespace MCCCivitasBlackTech
 
                         temp = UrlHelpers.CutHead(temp, "<a href=\"/Districts/");
                     }
+
                     this.ready = true;
                 }
-            }
-            ).Start();
+            }).Start();
         }
     }
 }
