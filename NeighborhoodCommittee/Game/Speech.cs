@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Text;
 
-    public class Speech
+    public class Speech:IComparable<Speech>
     {
         public string Owner { get; private set; }
         public string Text { get; private set; }
@@ -23,5 +23,14 @@
             this.Watch = watch;
             this.DisLike = dislike;
         }
+
+        #region IComparable implementation
+
+        public int CompareTo (Speech other)
+        {
+            return this.Time.RelTime.CompareTo (other.Time.RelTime);
+        }
+
+        #endregion
     }
 }
