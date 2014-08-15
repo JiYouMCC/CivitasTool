@@ -1,4 +1,4 @@
-﻿namespace MCCCivitasBlackTech.Game
+﻿namespace MCCCivitasBlackTech
 {
     using System;
     using System.Collections.Generic;
@@ -21,7 +21,7 @@
         {
             get;
             private set;
-        }       
+        }
 
         public int Day
         {
@@ -34,12 +34,18 @@
 
         public int Hour
         {
-            get { this.RelTime.Hour; }
+            get 
+            { 
+                return this.RelTime.Hour; 
+            }
         }
 
         public int Minute
         {
-            get { this.RelTime.Minute; }
+            get 
+            { 
+                return this.RelTime.Minute; 
+            }
         }
     }
 }

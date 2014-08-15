@@ -12,13 +12,7 @@ namespace MCCCivitasBlackTech
             this.EstatePath = estatePath;
             this.Owner = owner;
             this.OwnerPath = ownerPath;
-        }
-
-        public double CheckTax(double standard)
-        {
-            this.Tax = this.Area * standard;
-            return this.Tax;
-        }
+        }       
 
         public double Tax
         {
@@ -60,6 +54,12 @@ namespace MCCCivitasBlackTech
         {
             get;
             set;
+        }
+
+        public double CheckTax(double standard)
+        {
+            this.Tax = this.Area * standard;
+            return this.Tax;
         }
       
         public void Print()
