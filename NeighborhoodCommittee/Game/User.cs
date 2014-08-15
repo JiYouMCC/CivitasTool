@@ -9,6 +9,7 @@ namespace MCCCivitasBlackTech
 
     public class User
     {
+        private static object L=new object();
         private const string LOGIN = "http://www.soobb.com/Accounts/AjaxAuthenticate/";
         private string cookieContainer = string.Empty;
         private string emailAddress;
@@ -169,17 +170,17 @@ namespace MCCCivitasBlackTech
             }).Start();
         }
 
-        private void MethodSpeech(ref List<Speech> speechList,ref int finish,int number)
+        private void MethodSpeech(ref List<Speech> speechList,int number)
         {
-            Console.WriteLine("start"+number);
             string text = string.Empty;
             if (this.IsLogin)
             {
-                if (UrlHelpers.GetHtml("http://civitas.soobb.com/Forums/Speeches/?Page=" + number, ref text, this.cookieContainer) == 1)
+                if (UrlHelpers.GetHtml("http://civitas.soobb.com/Forums/Speeches/?SpeechType=1&Page=" + number, ref text, this.cookieContainer) == 1)
                 {
-                    text = UrlHelpers.CutKeepHead(text, "<div class=\"Speeches\"");
+                    text = UrlHelpers.CutBetween(text, "<div class=\"Speeches\"","<h4>系统消息");
                     while (text.Contains("<div class=\"Speech\""))
                     {
+                        text = UrlHelpers.CutHead(text, "<div class=\"Speech\"");
                         string name = UrlHelpers.CutHead(UrlHelpers.CutBetween(text, "<p class=\"Name\"><a href", "</a>："), "\">");
                         string t = UrlHelpers.CutTail(UrlHelpers.CutHead(text, "：</p>\r\n\t\t\t<p>"), "</p>");
                         int like = Convert.ToInt32(UrlHelpers.CutBetween(text, "class=\"Normal\">欢呼</a><span type=\"1\" class=\"Number\">(", ")</span>"));
@@ -188,8 +189,8 @@ namespace MCCCivitasBlackTech
                         string time = UrlHelpers.CutBetween(text, "演讲，第", "</p>");
                         //515天 10:57
                         int day = -1;
-                        int hour = -1;
-                        int min = -1;
+                        int hour =0;
+                        int min =0;
                         try
                         {
                             day = Convert.ToInt32(UrlHelpers.CutTail(time, "天"));
@@ -200,39 +201,32 @@ namespace MCCCivitasBlackTech
                         {
 
                         }
+                        lock(L)
+                        {
                         speechList.Add(new Speech(name, t, like, watch, dislike, new CivitasTime(day, hour, min)));
-                        text = UrlHelpers.CutHead(text, "<div class=\"Speech\"");
+                        }
+                       
                     }
-                }           
-                
+                } 
             }
-            finish++;
-            Console.WriteLine("--finish" + number);
         }    
         
 
         public void FindSpeech()
         {
             List<Speech> speechList = new List<Speech>();
-            int finish = 0;
-            ThreadPool.SetMaxThreads(10, 200);
-            ThreadPool.SetMinThreads(2, 40);
-            for (int i = 1; i < 1000; i++)
-            {
-               
-                //MethodSpeech(ref speechList, ref finish, i);
+            int page = 2428;
+            Console.WriteLine ("页面总数:"+page);
+            int i = 1;         
+            for (; i <= page; i++)
+            { 
+                MethodSpeech (ref speechList,i);
+                Console.WriteLine (i);
+            }
 
-                Thread myNewThread = new Thread(() => MethodSpeech(ref speechList, ref finish, i));
-                myNewThread.Start();
-                //Console.Write(i+",");
-            }
-            while (true)
-            {
-                Thread.Sleep(1000);
-                if (finish >= 1000)
-                    break;
-            }
-            using (StreamWriter sw = new StreamWriter("c:/4.txt", true))
+
+            speechList.Sort ();
+            using (StreamWriter sw = new StreamWriter("5.txt", true))
             {                
                 foreach (var s in speechList)
                 {
