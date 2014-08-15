@@ -168,5 +168,78 @@ namespace MCCCivitasBlackTech
                 }
             }).Start();
         }
+
+        private void MethodSpeech(ref List<Speech> speechList,ref int finish,int number)
+        {
+            Console.WriteLine("start"+number);
+            string text = string.Empty;
+            if (this.IsLogin)
+            {
+                if (UrlHelpers.GetHtml("http://civitas.soobb.com/Forums/Speeches/?Page=" + number, ref text, this.cookieContainer) == 1)
+                {
+                    text = UrlHelpers.CutKeepHead(text, "<div class=\"Speeches\"");
+                    while (text.Contains("<div class=\"Speech\""))
+                    {
+                        string name = UrlHelpers.CutHead(UrlHelpers.CutBetween(text, "<p class=\"Name\"><a href", "</a>："), "\">");
+                        string t = UrlHelpers.CutTail(UrlHelpers.CutHead(text, "：</p>\r\n\t\t\t<p>"), "</p>");
+                        int like = Convert.ToInt32(UrlHelpers.CutBetween(text, "class=\"Normal\">欢呼</a><span type=\"1\" class=\"Number\">(", ")</span>"));
+                        int watch = Convert.ToInt32(UrlHelpers.CutBetween(text, "class=\"Normal\">关注</a><span type=\"3\" class=\"Number\">(", ")</span>"));
+                        int dislike = Convert.ToInt32(UrlHelpers.CutBetween(text, "class=\"Normal\">倒彩</a><span type=\"2\" class=\"Number\">(", ")</span>"));
+                        string time = UrlHelpers.CutBetween(text, "演讲，第", "</p>");
+                        //515天 10:57
+                        int day = -1;
+                        int hour = -1;
+                        int min = -1;
+                        try
+                        {
+                            day = Convert.ToInt32(UrlHelpers.CutTail(time, "天"));
+                           hour = Convert.ToInt32(UrlHelpers.CutBetween(time, "天 ", ":"));
+                            min = Convert.ToInt32(UrlHelpers.CutHead(time, ":"));
+                        }
+                        catch
+                        {
+
+                        }
+                        speechList.Add(new Speech(name, t, like, watch, dislike, new CivitasTime(day, hour, min)));
+                        text = UrlHelpers.CutHead(text, "<div class=\"Speech\"");
+                    }
+                }           
+                
+            }
+            finish++;
+            Console.WriteLine("--finish" + number);
+        }    
+        
+
+        public void FindSpeech()
+        {
+            List<Speech> speechList = new List<Speech>();
+            int finish = 0;
+            ThreadPool.SetMaxThreads(10, 200);
+            ThreadPool.SetMinThreads(2, 40);
+            for (int i = 1; i < 1000; i++)
+            {
+               
+                //MethodSpeech(ref speechList, ref finish, i);
+
+                Thread myNewThread = new Thread(() => MethodSpeech(ref speechList, ref finish, i));
+                myNewThread.Start();
+                //Console.Write(i+",");
+            }
+            while (true)
+            {
+                Thread.Sleep(1000);
+                if (finish >= 1000)
+                    break;
+            }
+            using (StreamWriter sw = new StreamWriter("c:/4.txt", true))
+            {                
+                foreach (var s in speechList)
+                {
+                    sw.WriteLine("D"+s.Time.Day+" "+s.Time.Hour+":"+s.Time.Minute + " " + s.Owner + ":" + s.Text);
+                }
+            }
+
+        }
     }
 }

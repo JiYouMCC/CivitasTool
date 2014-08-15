@@ -132,9 +132,9 @@ namespace MCCCivitasBlackTech
 
         public void CheckTax(TaxStandard standard)
         {
-            if(this.ready)
+            if (this.ready)
             {
-                foreach(Estate es in this.Estates)
+                foreach (Estate es in this.Estates)
                 {
                     es.CheckTax(standard.GetStandard(es.Type));
                 }
