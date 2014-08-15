@@ -34,6 +34,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="Game\TaxStandard.cs" />
     <Compile Include="UrlHelpers.cs" />
     <Compile Include="Game\Market.cs" />
     <Compile Include="Game\Business.cs" />
@@ -47,9 +48,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Folder Include="Game\" />
     <Folder Include="documents\" />
-    <Folder Include="XmlOutPut\" />
-    <Folder Include="Food\" />
   </ItemGroup>
 </Project>

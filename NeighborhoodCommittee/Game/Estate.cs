@@ -13,6 +13,18 @@ namespace MCCCivitasBlackTech
             this.Owner = owner;
             this.OwnerPath = ownerPath;
         }
+
+        public double CheckTax(double standard)
+        {
+            this.Tax = this.Area * standard;
+            return this.Tax;
+        }
+
+        public double Tax
+        {
+            get;
+            private set;
+        }
         
         public string Name
         {

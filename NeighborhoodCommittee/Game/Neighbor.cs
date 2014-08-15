@@ -12,17 +12,17 @@ namespace MCCCivitasBlackTech
         private double health = 0;
         private double prosperity = 0;
         private double industry = 0;
+        private int id = -1;
 
         public Neighbor(int id, string name, User user)
         {
-            this.Id = id;
+            this.id = id;
             this.name = name;
         }
 
-        public int ID 
-        { 
-            get; 
-            set; 
+        public int Id
+        {
+            get { return this.id; }
         }
 
         public double Health
@@ -127,6 +127,17 @@ namespace MCCCivitasBlackTech
                     Console.WriteLine("\n窥探【" + this.Name + "】完毕，有种放学别走！");
                     this.ready = true;
                 }).Start();
+            }
+        }
+
+        public void CheckTax(TaxStandard standard)
+        {
+            if(this.ready)
+            {
+                foreach(Estate es in this.Estates)
+                {
+                    es.CheckTax(standard.GetStandard(es.Type));
+                }
             }
         }
     }
