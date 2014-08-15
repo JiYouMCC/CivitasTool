@@ -73,66 +73,8 @@ namespace Consoletest
                         if (c == neighbor.Id.ToString())
                         {
                             n = neighbor;
-                            Console.WriteLine(neighbor.Name + "受死吧！");
-                            List<EstateType> estateTypeList = new List<EstateType>();
-                            foreach (Estate estate in neighbor.Estates)
-                            {
-                                if (!estateTypeList.Contains(estate.Type))
-                                {
-                                    estateTypeList.Add(estate.Type);
-                                }
-                            }
-
-                            estateTypeList.Sort();
-
-                            Console.WriteLine("\n收税标准：价格/面积");
-
-                            Dictionary<EstateType, double> p = new Dictionary<EstateType, double>();
-                            foreach (EstateType type in estateTypeList)
-                            {
-                                Console.WriteLine(type.Name);
-                                Console.Write("价格：");
-                                double temp1 = Convert.ToDouble(Console.ReadLine());
-                                Console.Write("面积：");
-                                double temp2 = Convert.ToDouble(Console.ReadLine());
-                                double result = temp1 / temp2;
-                                if (result > 0)
-                                {
-                                    p.Add(type, result);
-                                }
-                            }
-
-                            foreach (KeyValuePair<EstateType, double> a in p)
-                            {
-                                Console.WriteLine(a.Key.Name + " " + a.Value.ToString());
-                            }                          
-
-                            Dictionary<string, double> pp = new Dictionary<string, double>();
-                            foreach (Estate estate in neighbor.Estates)
-                            {
-                                if (p.ContainsKey(estate.Type))
-                                {
-                                    double ppp = 0;
-                                    p.TryGetValue(estate.Type, out ppp);
-                                    double rr = estate.Area * ppp;
-                                    if (!pp.ContainsKey(estate.Owner))
-                                    {
-                                        pp.Add(estate.Owner, rr);
-                                    }
-                                    else
-                                    {
-                                        double old = 0;
-                                        pp.TryGetValue(estate.Owner, out old);
-                                        pp.Remove(estate.Owner);
-                                        pp.Add(estate.Owner, old + rr);
-                                    }
-                                }
-                            }
-
-                            foreach (KeyValuePair<string, double> a in pp)
-                            {
-                                Console.WriteLine(a.Key + " " + a.Value.ToString());
-                            }
+                            TaxStandard standard=TaxStandard.LoadStandard("");
+                            n.CheckTax(standard);
                         }
                     }
 
