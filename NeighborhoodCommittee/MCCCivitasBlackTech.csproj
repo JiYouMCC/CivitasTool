@@ -37,7 +37,8 @@
     <Compile Include="Game\CivitasTime.cs" />
     <Compile Include="Game\Speech.cs" />
     <Compile Include="Game\TaxStandard.cs" />
-    <Compile Include="UrlHelpers.cs" />
+    <Compile Include="Helper\ConsoleHelpers.cs" />
+    <Compile Include="Helper\UrlHelpers.cs" />
     <Compile Include="Game\Market.cs" />
     <Compile Include="Game\Business.cs" />
     <Compile Include="Game\Commodity.cs" />
