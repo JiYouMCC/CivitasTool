@@ -9,7 +9,6 @@ namespace MCCCivitasBlackTech
 
     public class User
     {
-        private static object L=new object();
         private const string LOGIN = "http://www.soobb.com/Accounts/AjaxAuthenticate/";
         private string cookieContainer = string.Empty;
         private string emailAddress;
@@ -18,6 +17,7 @@ namespace MCCCivitasBlackTech
         private List<Neighbor> neighbors = new List<Neighbor>();
         private string city = string.Empty;
         private bool ready = false;
+        public double speechPer;
 
         public User(string emailAddress, string password)
         {
@@ -169,71 +169,124 @@ namespace MCCCivitasBlackTech
                 }
             }).Start();
         }
+              
+        public void FindSpeech()
+        {
+            this.FindSpeech(50);
+        }
+        
+        public void FindSpeech(int threadCount)
+        {
+            List<Speech> speechList = new List<Speech>();
+            int pageCount = this.GetSpeechPage();
+            int maxThreadCount = threadCount;
+            int currentThreadCount = 0;
+            int finishPageCount = 0;
+            Console.WriteLine("Page Count:" + pageCount);
+            int pagePoint = 1;
 
-        private void MethodSpeech(ref List<Speech> speechList,int number)
+            Thread time = new Thread(delegate()
+                {
+                    while (true)
+                    {
+                        if (finishPageCount == pageCount)
+                        {
+                            break;
+                        }
+
+                        Thread.Sleep(1000);
+                        ConsoleHelpers.OutPersent((double)(100 * (double)finishPageCount / (double)pageCount));
+                        this.speechPer = (double)(100 * (double)finishPageCount / (double)pageCount);
+                    }
+                });
+            time.Start();
+
+            for (; pagePoint <= pageCount; pagePoint++)
+            {
+                // 防止多线程的时候point混乱
+                int tempPoint = pagePoint;
+                while (true)
+                {
+                    if (currentThreadCount < maxThreadCount)
+                    {
+                        currentThreadCount++;
+                        new Thread(() => this.MethodSpeech(ref speechList, tempPoint, ref finishPageCount, ref currentThreadCount)).Start();
+                        break;
+                    }
+                }                
+            }
+
+            time.Join();
+            speechList.Sort();
+            using (StreamWriter sw = new StreamWriter("speech.txt", true))
+            {
+                foreach (var s in speechList)
+                {
+                    sw.WriteLine("D" + s.Time.Day.ToString("D3") + " " + s.Time.Hour.ToString("D2") + ":" + s.Time.Minute.ToString("D2") + " " + s.Owner + ":" + s.Text.Replace("\n"," ").Replace("\r"," "));
+                }
+
+                Console.WriteLine("\n"+System.Environment.CurrentDirectory + "/speech.txt");
+            }
+        }
+
+        private void MethodSpeech(ref List<Speech> speechList, int number, ref int finish, ref int current)
         {
             string text = string.Empty;
             if (this.IsLogin)
             {
                 if (UrlHelpers.GetHtml("http://civitas.soobb.com/Forums/Speeches/?SpeechType=1&Page=" + number, ref text, this.cookieContainer) == 1)
                 {
-                    text = UrlHelpers.CutBetween(text, "<div class=\"Speeches\"","<h4>系统消息");
+                    text = UrlHelpers.CutBetween(text, "<div class=\"Speeches\"", "<h4>系统消息");
                     while (text.Contains("<div class=\"Speech\""))
                     {
                         text = UrlHelpers.CutHead(text, "<div class=\"Speech\"");
+                        int id = Convert.ToInt32(UrlHelpers.CutBetween(text, "speechid=\"", "\""));
                         string name = UrlHelpers.CutHead(UrlHelpers.CutBetween(text, "<p class=\"Name\"><a href", "</a>："), "\">");
                         string t = UrlHelpers.CutTail(UrlHelpers.CutHead(text, "：</p>\r\n\t\t\t<p>"), "</p>");
                         int like = Convert.ToInt32(UrlHelpers.CutBetween(text, "class=\"Normal\">欢呼</a><span type=\"1\" class=\"Number\">(", ")</span>"));
                         int watch = Convert.ToInt32(UrlHelpers.CutBetween(text, "class=\"Normal\">关注</a><span type=\"3\" class=\"Number\">(", ")</span>"));
                         int dislike = Convert.ToInt32(UrlHelpers.CutBetween(text, "class=\"Normal\">倒彩</a><span type=\"2\" class=\"Number\">(", ")</span>"));
                         string time = UrlHelpers.CutBetween(text, "演讲，第", "</p>");
-                        //515天 10:57
                         int day = -1;
-                        int hour =0;
-                        int min =0;
+                        int hour = 0;
+                        int min = 0;
                         try
                         {
                             day = Convert.ToInt32(UrlHelpers.CutTail(time, "天"));
-                           hour = Convert.ToInt32(UrlHelpers.CutBetween(time, "天 ", ":"));
+                            hour = Convert.ToInt32(UrlHelpers.CutBetween(time, "天 ", ":"));
                             min = Convert.ToInt32(UrlHelpers.CutHead(time, ":"));
                         }
                         catch
                         {
+                            Console.WriteLine("\n时间有个错误，可能是BOSS发言，不带天数和时间");
+                        }
 
-                        }
-                        lock(L)
-                        {
-                        speechList.Add(new Speech(name, t, like, watch, dislike, new CivitasTime(day, hour, min)));
-                        }
-                       
+                        speechList.Add(new Speech(id, name, t, like, watch, dislike, new CivitasTime(day, hour, min)));
                     }
-                } 
-            }
-        }    
-        
-
-        public void FindSpeech()
-        {
-            List<Speech> speechList = new List<Speech>();
-            int page = 2428;
-            Console.WriteLine ("页面总数:"+page);
-            int i = 1;         
-            for (; i <= page; i++)
-            { 
-                MethodSpeech (ref speechList,i);
-                Console.WriteLine (i);
-            }
-
-
-            speechList.Sort ();
-            using (StreamWriter sw = new StreamWriter("5.txt", true))
-            {                
-                foreach (var s in speechList)
-                {
-                    sw.WriteLine("D"+s.Time.Day+" "+s.Time.Hour+":"+s.Time.Minute + " " + s.Owner + ":" + s.Text);
                 }
             }
 
+            finish++;
+            current--;
+        }
+
+        private int GetSpeechPage()
+        {
+            string text = string.Empty;
+            if (this.IsLogin)
+            {
+                if (UrlHelpers.GetHtml("http://civitas.soobb.com/Forums/Speeches/?SpeechType=1", ref text, this.cookieContainer) == 1)
+                {
+                    text = UrlHelpers.CutBetween(text, "<li class=\"Break\">...</li>", "</ul>");
+                    text = UrlHelpers.CutHead(text, "<li><a");
+                    text = UrlHelpers.CutHead(text, "<li><a");
+                    text = UrlHelpers.CutHead(text, "<li><a");
+                    text = UrlHelpers.CutBetween(text, ">", "</a>");
+                    return Convert.ToInt32(text);
+                }
+            }
+
+            return 0;
         }
     }
 }
