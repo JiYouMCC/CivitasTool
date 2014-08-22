@@ -1,8 +1,3 @@
-//-----------------------------------------------------------------------
-// <copyright file="Main.cs">
-//     Company copyright tag.
-// </copyright>
-//-----------------------------------------------------------------------
 namespace Consoletest
 {
     using System;
@@ -28,7 +23,8 @@ namespace Consoletest
            
             if (user.Login())
             {
-                user.FindSpeech ();
+                Speech.FindSpeech(user.CookieContainer);
+                //user.FindSpeech ();
 //                Console.WriteLine("Enter succeed!");
 //                user.FindNeighbor();
 //                while (!user.Ready)
