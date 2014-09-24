@@ -2,7 +2,7 @@
 {
     using System;
 
-    class ConsoleHelpers
+    public class ConsoleHelpers
     {
         public static void OutPersent(double persent)
         {
@@ -30,6 +30,29 @@
             {
 
             }
+        }
+
+        public static string GetInput(bool pwdArea)
+        {
+            string result = string.Empty;
+
+            while (true)
+            {
+                ConsoleKeyInfo keyInfo = Console.ReadKey(pwdArea);
+                if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    break;
+                }
+
+                if (pwdArea)
+                {
+                    Console.Write("*");
+                }
+                result += keyInfo.KeyChar;
+            }
+            
+            return result;
         }
     }
 }
