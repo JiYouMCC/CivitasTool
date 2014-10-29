@@ -2,6 +2,7 @@
 import urllib2
 import re
 
+DOMAIN='http://civitas.soobb.com'
 
 def get_request(url, content='', cookie=None):
     headers = {'UserAgent': 'Mozilla/4.0 ',
@@ -42,4 +43,4 @@ def write_file(file, mode, string):
     output = open(file, mode)
     output.write(string + '\n')
     output.close()
-    print string
+    #print string
