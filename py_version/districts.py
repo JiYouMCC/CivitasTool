@@ -4,6 +4,7 @@ import re
 from mccblackteck import get_request, login, regex_find, DOMAIN, write_file
 from account import EMAIL, PWD
 import datetime
+import os
 
 cookie = login(EMAIL, PWD)
 district = []
@@ -14,6 +15,18 @@ else:
         DOMAIN + '/Forums/', cookie=cookie)
     if square_result['status']:
         square_content = square_result['content']
+        # city
+        city_name_list = regex_find(r'<title>.+?的广场', square_content)
+        for city_item in city_name_list:
+            compileResult = re.compile(r'<title>(.+?)的广场')
+            city_name = compileResult.sub(r'\1', city_item)
+        # day
+        day_list = regex_find(
+            r'<div class="Clock">[\w\W]+?<p>第.+?天', square_content)
+        for day_item in day_list:
+            compileResult = re.compile(
+                r'<div class="Clock">[\w\W]+?<p>第(.+?)天')
+            day_number = compileResult.sub(r'\1', day_item)
         district_list = regex_find(
             r'<h5><a href=\"/Districts/[0-9]{1,4}/\">.+</a></h5>',
             square_content)
@@ -35,36 +48,42 @@ else:
             district_content = district_result['content']
             district_list = regex_find(
                 r'<li><a href=\"/Districts/[0-9]{1,4}/Estates/\?Action=Search&Page=[0-9]{1,4}\">[0-9]{1,4}</a></li>[\w\W]{0,10}</ul>[\w\W]{0,10}<span class=\"Next\"><a href=\"/Districts/[0-9]{1,4}/Estates/\?Action=Search&Page=2\">后页 &gt;</a></span>[\w\W]{0,10}<span class=\"Count\">[\w\W]共 [0-9]{1,4} 条[\w\W]</span>', district_content)
-        for district_item in district_list:
+        pagecount, estatecount = None, None
+        for district_item in district_list:        
             compileResult = re.compile(
                 r'<li><a href=\"/Districts/[0-9]{1,4}/Estates/\?Action=Search&Page=([0-9]{1,4})\">[0-9]{1,4}</a></li>[\w\W]{0,10}</ul>[\w\W]{0,10}<span class=\"Next\"><a href=\"/Districts/[0-9]{1,4}/Estates/\?Action=Search&Page=2\">后页 &gt;</a></span>[\w\W]{0,10}<span class=\"Count\">[\w\W]共 ([0-9]{1,4}) 条[\w\W]</span>')
             pagecount = compileResult.sub(r'\1', district_item)
-            print compileResult.sub(r'\1', district_item), '页', compileResult.sub(r'\2', district_item), '条'
-            for page in range(1, int(pagecount) + 1):
-                page_result = get_request(
-                    DOMAIN + '/Districts/' +
-                    str(district_id) + '/Estates/?Action=Search&Page=' +
-                    str(page),
-                    cookie=cookie)
-                if page_result['status']:
-                    page_content = page_result['content']
-                    estate_list = regex_find(
-                        '<div class=\"Avatar\">[\w\W]{1,2000}产业影响', page_content)
-                    for estate in estate_list:
-                        compileResult = re.compile(
-                            r'[\w\W]+<h5><a href=\"(/Estates/[0-9]{1,10}/Details/)\">(.+)</a></h5>[\w\W]+')
-                        estate_link = compileResult.sub(r'\1', estate)
-                        name = compileResult.sub(r'\2', estate)
-                        compileResult = re.compile(
-                            r'[\w\W]+<div><a href=\"(.+)\" class="WithEntityCard" entityid=\"[0-9]{1,10}\">(.+)</a>的(.+)</div>[\w\W]+')
-                        owner_link = compileResult.sub(r'\1', estate)
-                        owner = compileResult.sub(r'\2', estate)
-                        etype = compileResult.sub(r'\3', estate)
-                        compileResult = re.compile(
-                            r'[\w\W]+<p class=\"Number\">(.{1,10})</p>[\w\W]{0,10}<p class="Tips">占地面积[\w\W]+')
-                        area = compileResult.sub(r'\1', estate)
-                        estates.append(
-                            [DOMAIN + estate_link, name, DOMAIN + owner_link, owner, etype, area])
+            estatecount = compileResult.sub(r'\2', district_item)
+        if not pagecount:
+            pagecount = 1
+        if not estatecount:
+            estatecount = "少于一页，不高兴数有几"
+        print pagecount, '页', estatecount, '条'
+        for page in range(1, int(pagecount) + 1):
+            page_result = get_request(
+                DOMAIN + '/Districts/' +
+                str(district_id) + '/Estates/?Action=Search&Page=' +
+                str(page),
+                cookie=cookie)
+            if page_result['status']:
+                page_content = page_result['content']
+                estate_list = regex_find(
+                    '<div class=\"Avatar\">[\w\W]{1,2000}产业影响', page_content)
+                for estate in estate_list:
+                    compileResult = re.compile(
+                        r'[\w\W]+<h5><a href=\"(/Estates/[0-9]{1,10}/Details/)\">(.+)</a></h5>[\w\W]+')
+                    estate_link = compileResult.sub(r'\1', estate)
+                    name = compileResult.sub(r'\2', estate)
+                    compileResult = re.compile(
+                        r'[\w\W]+<div><a href=\"(.+)\" class="WithEntityCard" entityid=\"[0-9]{1,10}\">(.+)</a>的(.+)</div>[\w\W]+')
+                    owner_link = compileResult.sub(r'\1', estate)
+                    owner = compileResult.sub(r'\2', estate)
+                    etype = compileResult.sub(r'\3', estate)
+                    compileResult = re.compile(
+                        r'[\w\W]+<p class=\"Number\">(.{1,10})</p>[\w\W]{0,10}<p class="Tips">占地面积[\w\W]+')
+                    area = compileResult.sub(r'\1', estate)
+                    estates.append(
+                        [DOMAIN + estate_link, name, DOMAIN + owner_link, owner, etype, area])
         output_string = '<table><tr><td>' + district_id + '</td><td>' + \
             district_name + '</td><td>' + \
             str(datetime.datetime.now()) + '</td></tr>'
@@ -82,4 +101,9 @@ else:
                                 4] + '</td><td>' + str(estate[
                                     5]) + '</td></tr>'
         output_string = output_string + '</table>'
-        write_file(district_name.decode("utf-8") + '.xml', 'a', output_string)
+        if not os.path.exists('districts'):
+            os.makedirs('districts')
+        if not os.path.exists(os.path.join('districts', city_name.decode("utf-8"))):
+            os.makedirs(os.path.join('districts', city_name.decode("utf-8")))
+        write_file(os.path.join('districts', city_name.decode("utf-8"),
+                                "D%s_%s_%s_%s.xml" % (day_number, datetime.datetime.now().hour, datetime.datetime.now().minute, district_name.decode("utf-8"))), 'a', output_string)
