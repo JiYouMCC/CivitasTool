@@ -2,21 +2,32 @@
 import urllib2
 import re
 
-DOMAIN='http://civitas.soobb.com'
+DOMAIN = 'http://civitas.soobb.com'
+
+RETRY = 10
+
 
 def get_request(url, content='', cookie=None):
     headers = {'UserAgent': 'Mozilla/4.0 ',
                'Accept-Encoding': 'utf-8',
                'Accept-Language': 'zh-CN',
-               'Referer': 'http://civitas.soobb.com'}
+               'Referer': DOMAIN}
     if not cookie is None:
         headers['cookie'] = cookie
     request = urllib2.Request(url, headers=headers)
-    try:
-        response = urllib2.urlopen(request, content)
-        return {'status': True, 'exception': None, 'info': response.info(), 'content': response.read()}
-    except Exception, ex:
-        return {'status': False, 'exception': ex}
+    response = None
+    ex = None
+    for i in range(RETRY):
+        try:
+            response = urllib2.urlopen(request, content)
+            return {'status': True,
+                    'exception': None,
+                    'info': response.info(),
+                    'content': response.read()}
+        except Exception, e:
+            ex = e
+    return {'status': False,
+            'exception': ex}
 
 
 def login(email, password):
@@ -43,4 +54,11 @@ def write_file(file, mode, string):
     output = open(file, mode)
     output.write(string + '\n')
     output.close()
-    #print string
+
+
+def tryutf8(str):
+    try:
+        str = str.encode('utf-8')
+    except Exception, e:
+        pass
+    return str
