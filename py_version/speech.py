@@ -1,5 +1,4 @@
 #-*- coding: utf-8 -*-
-import urllib2
 import re
 from bs4 import BeautifulSoup
 from mccblackteck import get_request, login, regex_find, DOMAIN, tryutf8
@@ -8,8 +7,6 @@ import threading
 import xlwt
 import sys
 import os
-reload(sys)
-sys.setdefaultencoding('utf8')
 
 SPEECH_TYPE = 1
 SPEECHES = {}
@@ -18,6 +15,7 @@ THREAD_SIZE = 50
 page_count = None
 FINISH = 0
 WIDTH = 68
+SPEECH_RETRY = 5
 
 
 class getSpeech (threading.Thread):
@@ -31,7 +29,7 @@ class getSpeech (threading.Thread):
     def run(self):
         global FINISH
         global page_count
-        while True:
+        for i in range(SPEECH_RETRY):
             try:
                 result = get_request(
                     '%s/Forums/Speeches/?SpeechType=%s&Page=%s' % (
@@ -132,7 +130,7 @@ else:
             page_count = int(
                 BeautifulSoup(str(pagination[0])).find_all('a', href=True)[-2].string)
     threads = []
-    for i in range(1, page_count + 1):
+    for i in range(1, 5 + 1):
         threads.append(getSpeech(i, cookie))
     for thread in threads:
         thread.start()

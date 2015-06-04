@@ -1,5 +1,4 @@
 #-*- coding: utf-8 -*-
-import urllib2
 import re
 from mccblackteck import tryutf8, get_request, login, regex_find, DOMAIN, write_file
 from account import EMAIL, PWD
