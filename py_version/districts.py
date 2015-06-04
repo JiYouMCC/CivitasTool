@@ -1,10 +1,12 @@
 #-*- coding: utf-8 -*-
 import urllib2
 import re
-from mccblackteck import get_request, login, regex_find, DOMAIN, write_file
+from mccblackteck import tryutf8, get_request, login, regex_find, DOMAIN, write_file
 from account import EMAIL, PWD
 import datetime
 import os
+import xlwt
+from bs4 import BeautifulSoup
 
 cookie = login(EMAIL, PWD)
 district = []
@@ -15,27 +17,19 @@ else:
         DOMAIN + '/Forums/', cookie=cookie)
     if square_result['status']:
         square_content = square_result['content']
+        soup = BeautifulSoup(square_content)
         # city
-        city_name_list = regex_find(r'<title>.+?的广场', square_content)
-        for city_item in city_name_list:
-            compileResult = re.compile(r'<title>(.+?)的广场')
-            city_name = compileResult.sub(r'\1', city_item)
+        city_name = tryutf8(
+            soup.find_all('title')[0].string.split('的广场'.decode('utf-8'))[0])
         # day
-        day_list = regex_find(
-            r'<div class="Clock">[\w\W]+?<p>第.+?天', square_content)
-        for day_item in day_list:
-            compileResult = re.compile(
-                r'<div class="Clock">[\w\W]+?<p>第(.+?)天')
-            day_number = compileResult.sub(r'\1', day_item)
-        district_list = regex_find(
-            r'<h5><a href=\"/Districts/[0-9]{1,4}/\">.+</a></h5>',
-            square_content)
-        for district_item in district_list:
-            compileResult = re.compile(
-                r'<h5><a href=\"/Districts/([0-9]{1,10})/\">(.+)</a></h5>')
-            district.append([
-                compileResult.sub(r'\1', district_item),
-                compileResult.sub(r'\2', district_item)])
+        day_number = int(regex_find(
+            r'[0-9]+', BeautifulSoup(str(soup.find_all('div', class_='Clock')[0])).find_all('p')[1].string)[0])
+        soup_districts = soup.find_all('div', class_='District', href=True)
+        for district_item in soup_districts:
+            soup_district_tag = BeautifulSoup(str(district_item)).find_all(
+                'a', class_=False, href=True)[0]
+            district.append([int(regex_find(
+                r'[0-9]+', str(soup_district_tag))[0]),  tryutf8(soup_district_tag.string)])
     for district_item in district:
         district_id = district_item[0]
         district_name = district_item[1]
@@ -49,7 +43,7 @@ else:
             district_list = regex_find(
                 r'<li><a href=\"/Districts/[0-9]{1,4}/Estates/\?Action=Search&Page=[0-9]{1,4}\">[0-9]{1,4}</a></li>[\w\W]{0,10}</ul>[\w\W]{0,10}<span class=\"Next\"><a href=\"/Districts/[0-9]{1,4}/Estates/\?Action=Search&Page=2\">后页 &gt;</a></span>[\w\W]{0,10}<span class=\"Count\">[\w\W]共 [0-9]{1,4} 条[\w\W]</span>', district_content)
         pagecount, estatecount = None, None
-        for district_item in district_list:        
+        for district_item in district_list:
             compileResult = re.compile(
                 r'<li><a href=\"/Districts/[0-9]{1,4}/Estates/\?Action=Search&Page=([0-9]{1,4})\">[0-9]{1,4}</a></li>[\w\W]{0,10}</ul>[\w\W]{0,10}<span class=\"Next\"><a href=\"/Districts/[0-9]{1,4}/Estates/\?Action=Search&Page=2\">后页 &gt;</a></span>[\w\W]{0,10}<span class=\"Count\">[\w\W]共 ([0-9]{1,4}) 条[\w\W]</span>')
             pagecount = compileResult.sub(r'\1', district_item)
@@ -84,7 +78,7 @@ else:
                     area = compileResult.sub(r'\1', estate)
                     estates.append(
                         [DOMAIN + estate_link, name, DOMAIN + owner_link, owner, etype, area])
-        output_string = '<table><tr><td>' + district_id + '</td><td>' + \
+        output_string = '<table><tr><td>' + str(district_id) + '</td><td>' + \
             district_name + '</td><td>' + \
             str(datetime.datetime.now()) + '</td></tr>'
         output_string = output_string + \
