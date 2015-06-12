@@ -5,6 +5,7 @@ import re
 DOMAIN = 'http://civitas.soobb.com'
 
 RETRY = 10
+WIDTH = 68
 
 
 def get_request(url, content='', cookie=None):
@@ -62,3 +63,9 @@ def tryutf8(str):
     except Exception, e:
         pass
     return str
+
+
+def print_processbar(now, finish):
+    oks = "=" * int(float(finish) / now * WIDTH)
+    fls = " " * (WIDTH - int(float(finish) / now * WIDTH))
+    print "\r[%s%s]%.2f" % (oks, fls, (float(finish) / now * 100)), "%",

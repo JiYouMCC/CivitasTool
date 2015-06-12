@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 import re
 from bs4 import BeautifulSoup
-from mccblackteck import get_request, login, regex_find, DOMAIN, tryutf8
+from mccblackteck import get_request, login, regex_find, DOMAIN, tryutf8, print_processbar
 from account import EMAIL, PWD
 import threading
 import xlwt
@@ -14,7 +14,6 @@ threadLock = threading.Lock()
 THREAD_SIZE = 50
 page_count = None
 FINISH = 0
-WIDTH = 68
 SPEECH_RETRY = 5
 
 
@@ -107,9 +106,7 @@ class getSpeech (threading.Thread):
                 print self.page_num, e
         threadLock.acquire()
         FINISH += 1
-        oks = "=" * int(float(FINISH) / page_count * WIDTH)
-        fls = " " * (WIDTH - int(float(FINISH) / page_count * WIDTH))
-        print "\r[%s%s]%.2f" % (oks, fls, (float(FINISH) / page_count * 100)), "%",
+        print_processbar(page_count, FINISH)
         threadLock.release()
 
 
@@ -130,7 +127,7 @@ else:
             page_count = int(
                 BeautifulSoup(str(pagination[0])).find_all('a', href=True)[-2].string)
     threads = []
-    for i in range(1, 5 + 1):
+    for i in range(1, page_count + 1):
         threads.append(getSpeech(i, cookie))
     for thread in threads:
         thread.start()
