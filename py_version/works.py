@@ -92,7 +92,7 @@ else:
                 table.write(i, j, title[j])
             i += 1
         for j in range(9):
-            table.write(i, j, float(work[0]))
+            table.write(i, j, float(work[j]))
         i += 1
         if i == 65535:
             i = 0

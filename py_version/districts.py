@@ -74,23 +74,28 @@ else:
                             r'[\w\W]+<p class=\"Number\">(.{1,10})</p>[\w\W]{0,10}<p class="Tips">占地面积[\w\W]+')
                         area = compileResult.sub(r'\1', estate)
                         estates.append(
-                            [DOMAIN + estate_link, name, DOMAIN + owner_link, owner, etype, area])            
+                            [DOMAIN + estate_link, name, DOMAIN + owner_link, owner, etype, area])
             sheet = file.add_sheet(str(district_name), cell_overwrite_ok=True)
             style = xlwt.XFStyle()
             font = xlwt.Font()
             font.bold = True
             style.font = font
-            sheet.write(0, 0, '不动产名称',style=style)
-            sheet.write(0, 1, '不动产主人',style=style)
-            sheet.write(0, 2, '类型',style=style)
-            sheet.write(0, 3, '面积',style=style)
+            sheet.write(0, 0, '不动产名称', style=style)
+            sheet.write(0, 1, '不动产链接', style=style)
+            sheet.write(0, 2, '不动产主人', style=style)
+            sheet.write(0, 3, '不动产主人链接', style=style)
+            sheet.write(0, 4, '类型', style=style)
+            sheet.write(0, 5, '面积', style=style)
             i = 1
             for estate in estates:
-                sheet.write(i, 0, xlwt.Formula('HYPERLINK("%s";"%s")' % (estate[0], estate[1].decode("utf-8"))))
-                sheet.write(i, 1, xlwt.Formula('HYPERLINK("%s";"%s")' % (estate[2], estate[3].decode("utf-8"))))
-                sheet.write(i, 2, estate[4])
-                sheet.write(i, 3, estate[5])
+                sheet.write(i, 0, estate[1])
+                sheet.write(i, 1, estate[0])
+                sheet.write(i, 2, estate[3])
+                sheet.write(i, 3, estate[2])
+                sheet.write(i, 4, estate[4])
+                sheet.write(i, 5, float(estate[5]))
                 i += 1
+            print estates
             if not os.path.exists('districts'):
                 os.makedirs('districts')
         file.save(os.path.join('districts', 'districts.xls'))
