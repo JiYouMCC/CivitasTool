@@ -1,4 +1,4 @@
-CivitasTool C世界黑科技
+CivitasTool C世界黑科技[![Build Status](https://travis-ci.org/JiYouMCC/CivitasTool.svg?branch=master)](https://travis-ci.org/JiYouMCC/CivitasTool)
 ===========
 ###Done
 1.  (C#)街区不动产统计/演讲统计/市场统计
