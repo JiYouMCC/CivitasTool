@@ -1,10 +1,10 @@
 # Civitas Tools in python #
 ## Content ##
-1 About Civitas
-2 districts.py
-3 estate.py
-4 speech.py
-5 works.py
+1. About Civitas
+2. districts.py
+3. estate.py
+4. speech.py
+5. works.py
 ## About Civitas ##
 [civitas](http://civitas.soobb.com)
 ## districts.py ##
